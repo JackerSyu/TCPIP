@@ -14,6 +14,7 @@ Measure the throughput (Mbps) by using UDP and TCP sockets, respectively (15 pts
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <sys/time.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -24,6 +25,10 @@ Measure the throughput (Mbps) by using UDP and TCP sockets, respectively (15 pts
 
 int main(int argc , char *argv[])
 {
+    // time function , more info to the folder of TimeFunction or reference [2]
+    struct  timeval start;
+    struct  timeval end;
+    unsigned long diff;
 
     //socket的建立
     int sockfd = 0; 
@@ -46,6 +51,7 @@ int main(int argc , char *argv[])
     //socket的連線
 
     struct sockaddr_in info;
+    int byteSend, byteRecv;
     bzero(&info,sizeof(info));
     info.sin_family = PF_INET;
     info.sin_addr.s_addr = inet_addr("127.0.0.1");
@@ -66,7 +72,9 @@ int main(int argc , char *argv[])
 
 
     //Send a message to server
-    if(send(sockfd,message,sizeof(message),0) == -1)
+    byteSend = send(sockfd,message,sizeof(message),0);
+    gettimeofday(&start,NULL); //// start to cal the time
+    if( byteSend == -1)
     {
         printf("\tFail to send packet....\n");
         close(sockfd);
@@ -77,7 +85,9 @@ int main(int argc , char *argv[])
         printf("\tsending  a message: %s \n", message);
     }
     
-    if(recv(sockfd,receiveMessage,sizeof(receiveMessage),0) == -1)
+    byteRecv = recv(sockfd,receiveMessage,sizeof(receiveMessage),0);
+    gettimeofday(&end,NULL);//// end to cal the time 
+    if( byteRecv == -1)
     {
         printf("\tfail to receive the packet\n");
         close(sockfd);
@@ -86,10 +96,10 @@ int main(int argc , char *argv[])
     else
     {
         printf("\n****************************************************\n");
-        printf("\treceived a message: %s\n",receiveMessage);
-        printf("\tclose Socket\n");
+        printf("Server: %s\n",receiveMessage);
     }
-
+    diff = 1000000 *(end.tv_sec-start.tv_sec)+ end.tv_usec-start.tv_usec;
+    printf("latency =  %lf sec\n",(double)diff / 1000000 );  
     close(sockfd);
     return 0;
 }
