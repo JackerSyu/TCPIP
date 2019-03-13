@@ -4,8 +4,8 @@
 
 - Have to run in Linux OS
   - basic knowledge in compiling C language
-  - compile: cd to your folder and iput command $make XXX(your file's name)
-  - execution: input command line : $./XXX (your file's name)
+    - compile: cd to your folder and iput command $make XXX(your file's name)
+    - execution: input command line : $./XXX (your file's name)
 
 - References: 
 
