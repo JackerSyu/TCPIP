@@ -3,7 +3,7 @@
 #include<unistd.h>
   
   
-int main()
+int main(void)
 {
         struct  timeval start;
         struct  timeval end;

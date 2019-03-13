@@ -24,12 +24,10 @@ Measure the throughput (Mbps) by using UDP and TCP sockets, respectively (15 pts
 #define RECV_MAX 256
 int main(int argc , char *argv[])
 {
-    // time function 
+    // time function , more info to the folder of TimeFunction or reference [2]
     struct  timeval start;
     struct  timeval end;
     unsigned long diff;
-
-
 
     //socket的建立
     int sockfd = 0, byteSent,byteRecv;
@@ -38,9 +36,10 @@ int main(int argc , char *argv[])
 
     printf("*** HINT: send \"exit\" to close the server ***\n");
     printf("Packet content: ");
-    scanf("%[^\n]",message);
-    sockfd = socket(AF_INET , SOCK_DGRAM , 0);
+    scanf("%[^\n]",message);// 解決scanf無法讀取空格問題, more info to the reference [1] 
+
     printf("****************************************************\n\n");
+    sockfd = socket(AF_INET , SOCK_DGRAM , 0);
     if (sockfd == -1){
         printf("Fail to create a socket.");
     }
@@ -48,20 +47,18 @@ int main(int argc , char *argv[])
     {
         printf("\tbuilding socket successfully... \n");
     }
+
     //socket的連線
     struct sockaddr_in info;
+    int address_length = sizeof(info);
     bzero(&info,sizeof(info));
     info.sin_family = AF_INET;
-
-    //localhost test
     info.sin_addr.s_addr = inet_addr("127.0.0.1");
     info.sin_port = htons(8080);
-    int address_length = sizeof(info);
-
     
     //Send a message to server
     byteSent = sendto(sockfd, message, sizeof(message),0, (struct sockaddr *)&info, address_length);
-    gettimeofday(&start,NULL); ////
+    gettimeofday(&start,NULL); //// start to cal the time
     if(byteSent < 0)
     {
         printf("\tFail to send packet....\n");
@@ -74,13 +71,11 @@ int main(int argc , char *argv[])
     }
     printf("****************************************************\n");
     byteRecv = recvfrom(sockfd, receiveMessage, sizeof(receiveMessage), 0, (struct sockaddr *) &info, &address_length); 
-    gettimeofday(&end,NULL);////
+    gettimeofday(&end,NULL);//// end to cal the time 
     printf("Server : %s\n", receiveMessage); 
 
     diff = 1000000 *(end.tv_sec-start.tv_sec)+ end.tv_usec-start.tv_usec;
     printf("latency =  %lf sec\n",(double)diff / 1000000 );   
-        
-        
     
     close(sockfd);
     return 0;

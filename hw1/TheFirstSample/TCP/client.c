@@ -33,7 +33,7 @@ int main(int argc , char *argv[])
     sockfd = socket(AF_INET , SOCK_STREAM , 0);
     printf("*** HINT: send \"exit\" to close the server ***\n");
     printf("Packet content: ");
-    scanf("%[^\n]",message);
+    scanf("%[^\n]",message); // 解決scanf無法讀取空格問題
     printf("****************************************************\n\n");
     if (sockfd == -1){
         printf("Fail to create a socket.");
@@ -48,15 +48,16 @@ int main(int argc , char *argv[])
     struct sockaddr_in info;
     bzero(&info,sizeof(info));
     info.sin_family = PF_INET;
-
-    //localhost test
     info.sin_addr.s_addr = inet_addr("127.0.0.1");
     info.sin_port = htons(8080);
 
 
     int err = connect(sockfd,(struct sockaddr *)&info,sizeof(info));
-    if(err==-1){
+    if(err == -1)
+    {
         printf("Connection error");
+        close(sockfd);
+        return 0;
     }
     else
     {
@@ -65,13 +66,30 @@ int main(int argc , char *argv[])
 
 
     //Send a message to server
+    if(send(sockfd,message,sizeof(message),0) == -1)
+    {
+        printf("\tFail to send packet....\n");
+        close(sockfd);
+        return 0;
+    }
+    else
+    {
+        printf("\tsending  a message: %s \n", message);
+    }
+    
+    if(recv(sockfd,receiveMessage,sizeof(receiveMessage),0) == -1)
+    {
+        printf("\tfail to receive the packet\n");
+        close(sockfd);
+        return 0;
+    }
+    else
+    {
+        printf("\n****************************************************\n");
+        printf("\treceived a message: %s\n",receiveMessage);
+        printf("\tclose Socket\n");
+    }
 
-    send(sockfd,message,sizeof(message),0);
-    printf("\tsending  a message: %s \n", message);
-    recv(sockfd,receiveMessage,sizeof(receiveMessage),0);
-    printf("\n****************************************************\n");
-    printf("\treceived a message: %s\n",receiveMessage);
-    printf("\tclose Socket\n");
     close(sockfd);
     return 0;
 }
