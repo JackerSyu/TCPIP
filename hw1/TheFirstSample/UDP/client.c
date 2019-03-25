@@ -75,8 +75,10 @@ int main(int argc , char *argv[])
     printf("Server : %s\n", receiveMessage); 
 
     diff = 1000000 *(end.tv_sec-start.tv_sec)+ end.tv_usec-start.tv_usec;
-    printf("latency =  %lf sec\n",(double)diff / 1000000 );   
+    double latency = (double)diff / 1000000;
+    printf("latency =  %lf sec\n", latency);   
     
+    printf("throughput= %lf MB/sec\n", ((sizeof(message) + sizeof(receiveMessage)) / latency) / (1024 * 1024));
     close(sockfd);
     return 0;
 }
